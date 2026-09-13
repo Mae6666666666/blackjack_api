@@ -37,6 +37,9 @@ def health():
 
 # --- Your endpoints go below ------------------------------------------------
 
+@app.post("/games")
+def games_post():
+    return games
 
 
 # The page's files and card images, served at /static/style.css,

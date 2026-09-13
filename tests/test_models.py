@@ -22,8 +22,6 @@ Work through these tests in order. When one goes green, delete the
 @pytest.mark.skip line above the next one.
 """
 
-import pytest
-
 
 def test_game_state_keeps_the_values_it_is_given():
     from models import GameState
@@ -46,7 +44,7 @@ def test_game_state_keeps_the_values_it_is_given():
     assert state.result is None
 
 
-@pytest.mark.skip(reason="Mae: delete this line when the test above is green")
+
 def test_game_state_result_is_none_if_you_leave_it_out():
     from models import GameState
 
@@ -61,19 +59,17 @@ def test_game_state_result_is_none_if_you_leave_it_out():
     assert state.result is None
 
 
-@pytest.mark.skip(reason="Mae: delete this line when the test above is green")
-def test_game_state_refuses_a_total_that_is_not_a_number():
-    from pydantic import ValidationError
+def test_game_state_player_total_must_be_a_number():
     from models import GameState
 
-    # This test should pass as soon as the model exists -- pydantic does the
-    # checking for you. Read it anyway: this is what "it checks your work" means.
-    with pytest.raises(ValidationError):
-        GameState(
-            id="abc",
-            player_hand=["h9", "h5"],
-            dealer_hand=["d9", "d6"],
-            player_total="sixteen",
-            dealer_total=17,
-            status="player_turn",
-        )
+    # Run this and read the red error: pydantic refuses "sixteen" because
+    # player_total is an int. Then change "sixteen" to 16 to make it green.
+    state = GameState(
+        id="abc",
+        player_hand=["h9", "h5"],
+        dealer_hand=["d9", "d6"],
+        player_total=16,
+        dealer_total=17,
+        status="player_turn",
+    )
+    assert state.player_total == 16

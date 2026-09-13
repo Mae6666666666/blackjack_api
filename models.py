@@ -38,3 +38,12 @@ class HealthResponse(BaseModel):
 
 
 # --- Your model goes below --------------------------------------------------
+
+class GameState(BaseModel):
+    id: str
+    player_hand: list[str]
+    dealer_hand: list[str]
+    player_total: int
+    dealer_total: int
+    status: str
+    result: str | None = None

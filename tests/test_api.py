@@ -70,7 +70,7 @@ PLAYER_BLACKJACK_DECK = ["h0", "h12", "d9", "d6", "c2", "s8"]
 # ROUND 1 -- Deal.  POST /games starts a new game.
 # ============================================================================
 
-@pytest.mark.skip(reason="Mae: delete this line to start Round 1")
+
 def test_new_game_responds_with_200(client, use_deck):
     use_deck(DECK)
     response = client.post("/games")
