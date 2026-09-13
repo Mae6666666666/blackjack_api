@@ -2,3 +2,6 @@
 __pycache__/
 .pytest_cache/
 .DS_Store
+
+# Local Claude Code instructions (teaching setup) -- not for the public repo
+CLAUDE.local.md
