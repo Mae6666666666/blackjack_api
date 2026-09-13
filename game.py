@@ -97,3 +97,37 @@ def shuffle(deck):
     shuffled = list(deck)
     random.shuffle(shuffled)
     return shuffled
+
+
+# --- The dealer and the result ----------------------------------------------
+
+def dealer_should_hit(hand):
+    """The dealer takes a card under 17 and stands on 17 or more."""
+    return total_calc(hand) < 17
+
+
+def play_dealer_turn(deck, hand):
+    """Keep dealing the dealer cards until they reach 17. Returns the hand."""
+    while dealer_should_hit(hand):
+        hand.append(deal_card(deck))
+    return hand
+
+
+def who_wins(dealer_hand, player_hand):
+    """The result of a finished round: "Dealer", "Player" or "Draw"."""
+    # The player plays first, so a player who busts has lost before the
+    # dealer even starts -- even if the dealer busts too.
+    if is_bust(player_hand):
+        return "Dealer"
+    if is_bust(dealer_hand):
+        return "Player"
+
+    # A blackjack beats any other 21. Two blackjacks draw.
+    player_blackjack = is_blackjack(player_hand)
+    dealer_blackjack = is_blackjack(dealer_hand)
+    if player_blackjack and not dealer_blackjack:
+        return "Player"
+    if dealer_blackjack and not player_blackjack:
+        return "Dealer"
+
+    return compare_hands(dealer_hand, player_hand)

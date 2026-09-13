@@ -213,3 +213,88 @@ def test_shuffle_leaves_the_original_deck_alone():
     deck = game.build_deck()
     game.shuffle(deck)
     assert deck == game.build_deck()
+
+
+# --- dealer_should_hit ------------------------------------------------------
+
+def test_dealer_should_hit_on_16():
+    assert game.dealer_should_hit(["d9", "h5"]) is True  # 10 + 6
+
+
+def test_dealer_should_stand_on_17():
+    assert game.dealer_should_hit(["d9", "h6"]) is False  # 10 + 7
+
+
+def test_dealer_should_stand_on_soft_17():
+    # Ace + 6 counts as 17, so the dealer stands.
+    assert game.dealer_should_hit(["d0", "h5"]) is False
+
+
+# --- play_dealer_turn -------------------------------------------------------
+
+def test_play_dealer_turn_dealer_on_17_takes_no_cards():
+    deck = ["h2"]
+    assert game.play_dealer_turn(deck, ["d9", "h6"]) == ["d9", "h6"]
+
+
+def test_play_dealer_turn_dealer_on_16_takes_a_card():
+    deck = ["h2"]  # a 3, taking the dealer to 19
+    assert game.play_dealer_turn(deck, ["d9", "h5"]) == ["d9", "h5", "h2"]
+
+
+def test_play_dealer_turn_dealer_who_stands_does_not_touch_the_deck():
+    deck = ["h2"]
+    game.play_dealer_turn(deck, ["d9", "h6"])
+    assert deck == ["h2"]
+
+
+def test_play_dealer_turn_keeps_taking_cards_until_17():
+    # 12, then h2 (3) makes 15, then h4 (5) makes 20.
+    deck = ["h2", "h4"]
+    assert game.play_dealer_turn(deck, ["d9", "h1"]) == ["d9", "h1", "h2", "h4"]
+
+
+def test_play_dealer_turn_dealer_can_bust():
+    # 16, then s9 (10) makes 26.
+    deck = ["s9", "h2"]
+    assert game.play_dealer_turn(deck, ["d9", "h5"]) == ["d9", "h5", "s9"]
+
+
+# --- who_wins ---------------------------------------------------------------
+
+def test_who_wins_dealer_busts_player_wins():
+    assert game.who_wins(["d9", "h9", "s4"], ["d9", "h9"]) == "Player"
+
+
+def test_who_wins_player_busts_dealer_wins():
+    assert game.who_wins(["d9", "h9"], ["d9", "h9", "s4"]) == "Dealer"
+
+
+def test_who_wins_both_bust_dealer_wins():
+    # The player busted first, so they have already lost.
+    assert game.who_wins(["d9", "h9", "s4"], ["d9", "h9", "s5"]) == "Dealer"
+
+
+def test_who_wins_nobody_bust_player_closer_to_21():
+    assert game.who_wins(["d9", "h8"], ["d9", "h9"]) == "Player"  # 19 v 20
+
+
+def test_who_wins_nobody_bust_dealer_closer_to_21():
+    assert game.who_wins(["d9", "h9"], ["d9", "h8"]) == "Dealer"  # 20 v 19
+
+
+def test_who_wins_same_total_is_a_draw():
+    assert game.who_wins(["d9", "h9"], ["s9", "c9"]) == "Draw"
+
+
+def test_who_wins_player_blackjack_beats_a_dealer_21():
+    # Player: ace + king. Dealer: 7 + 4 + 10 = 21 from three cards.
+    assert game.who_wins(["h6", "h3", "s9"], ["d0", "d12"]) == "Player"
+
+
+def test_who_wins_dealer_blackjack_beats_a_player_21():
+    assert game.who_wins(["d0", "d12"], ["h6", "h3", "s9"]) == "Dealer"
+
+
+def test_who_wins_two_blackjacks_draw():
+    assert game.who_wins(["d0", "d12"], ["h0", "h9"]) == "Draw"
