@@ -1,12 +1,15 @@
 from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from game import build_deck, shuffle
 from models import HealthResponse
 
 app = FastAPI()
+
+STATIC = Path(__file__).parent / "static"
 
 # Every game in progress, looked up by its id. This lives in memory, so all
 # the games disappear when the server restarts.
@@ -22,6 +25,11 @@ def make_deck():
     return shuffle(build_deck())
 
 
+@app.get("/")
+def home_page():
+    return FileResponse(STATIC / "index.html")
+
+
 @app.get("/health", response_model=HealthResponse)
 def health():
     return HealthResponse(status="ok")
@@ -31,9 +39,6 @@ def health():
 
 
 
-# The card images, served at /static/deck/hearts_0.png and so on.
-app.mount(
-    "/static",
-    StaticFiles(directory=Path(__file__).parent / "static"),
-    name="static",
-)
+# The page's files and card images, served at /static/style.css,
+# /static/deck/hearts_0.png and so on.
+app.mount("/static", StaticFiles(directory=STATIC), name="static")

@@ -14,6 +14,7 @@ uv run fastapi dev main.py # start the server
 
 With the server running:
 
+- http://127.0.0.1:8000 — the game
 - http://127.0.0.1:8000/health — is the API alive?
 - http://127.0.0.1:8000/docs — every endpoint, and you can try them out
 - http://127.0.0.1:8000/static/deck/hearts_0.png — a card image
@@ -31,6 +32,9 @@ In VS Code, the Testing panel and the play buttons next to each test work too.
 | `tests/test_models.py` | Tests for the models. |
 | `tests/test_api.py` | Tests for the endpoints. |
 | `tests/conftest.py` | Shared test setup: a test client and a fixed deck. |
+| `static/index.html`, `static/style.css` | The web page. |
+| `static/page.js` | Draws the game on the page. |
+| `static/app.js` | Connects the page to the API. |
 | `static/deck/` | The card images. |
 
 ## Your JavaScript functions, in Python
@@ -76,3 +80,9 @@ Changes from the JS version:
 3. Open `tests/test_models.py` and write `GameState`.
 4. Work down `tests/test_api.py` one test at a time. When a test goes green,
    delete the `@pytest.mark.skip` line above the next one.
+5. The tests come in rounds: **Deal**, **Hit**, **Stand**, then **making the API
+   solid**. At the end of each round, do the same round in `static/app.js` and
+   try it in the browser before carrying on.
+
+The page's HTML, CSS and `page.js` are done. Your JavaScript is only the part
+that talks to the API.

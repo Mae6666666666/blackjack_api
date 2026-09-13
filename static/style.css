@@ -1,0 +1,220 @@
+:root {
+  --felt: #0f5132;
+  --felt-light: #1d7a4c;
+  --felt-dark: #062a1b;
+  --rail: #3a2314;
+  --rail-light: #5a3a22;
+  --gold: #e8c46a;
+  --cream: #f6f1e3;
+  --win: #8ff0b6;
+  --lose: #ff9b9b;
+  --card-width: 96px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  place-items: center;
+  padding: 24px;
+  font-family: Georgia, "Times New Roman", serif;
+  color: var(--cream);
+  background-color: var(--felt-dark);
+  background-image: radial-gradient(ellipse at 50% 35%, #123f2a, var(--felt-dark) 75%);
+}
+
+/* The table: green felt inside a wooden rail. */
+.table {
+  width: 100%;
+  max-width: 760px;
+  padding: 36px 28px 32px;
+  text-align: center;
+  background: radial-gradient(ellipse at 50% 40%, var(--felt-light), var(--felt) 55%, #0a3d25 100%);
+  border: 14px solid var(--rail);
+  border-radius: 240px 240px 40px 40px / 150px 150px 40px 40px;
+  box-shadow:
+    inset 0 0 0 2px rgba(232, 196, 106, 0.4),
+    inset 0 0 80px rgba(0, 0, 0, 0.35),
+    0 0 0 2px var(--rail-light),
+    0 24px 60px rgba(0, 0, 0, 0.55);
+}
+
+.title {
+  margin: 4px 0 2px;
+  font-size: 2.2rem;
+  font-weight: normal;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+}
+
+.subtitle {
+  margin: 0 0 22px;
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+
+.seat h2 {
+  margin: 0 0 10px;
+  font-size: 0.95rem;
+  font-weight: normal;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+/* The little badge with the hand's total. Hidden until there is a number. */
+.total {
+  display: inline-block;
+  min-width: 2.4em;
+  margin-left: 0.5em;
+  padding: 0.15em 0.55em;
+  border-radius: 999px;
+  font-family: system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--felt-dark);
+  background: var(--gold);
+}
+
+.total:empty {
+  display: none;
+}
+
+/* A row of overlapping cards. */
+.hand {
+  display: flex;
+  justify-content: center;
+  min-height: calc(var(--card-width) * 1.39 + 8px);
+  padding: 4px 20px;
+}
+
+/* An outline where the cards will go, before the first deal. */
+.hand:empty::before {
+  content: "";
+  width: var(--card-width);
+  height: calc(var(--card-width) * 1.39);
+  border: 2px dashed rgba(246, 241, 227, 0.25);
+  border-radius: 7px;
+}
+
+.card {
+  width: var(--card-width);
+  height: auto;
+  margin-left: calc(var(--card-width) * -0.36);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+  animation: deal 0.35s ease-out both;
+}
+
+.card:first-child {
+  margin-left: 0;
+}
+
+@keyframes deal {
+  from {
+    opacity: 0;
+    transform: translateY(-40px) rotate(-10deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.message {
+  min-height: 1.5em;
+  margin: 20px 0;
+  font-size: 1.4rem;
+  font-style: italic;
+}
+
+/* page.js sets data-result on the table when a round ends. */
+.table[data-result="Player"] .message {
+  color: var(--win);
+}
+
+.table[data-result="Dealer"] .message {
+  color: var(--lose);
+}
+
+.table[data-result="Draw"] .message {
+  color: var(--gold);
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+button {
+  padding: 0.7em 1.7em;
+  font: inherit;
+  font-size: 0.95rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: rgba(0, 0, 0, 0.15);
+  border: 2px solid var(--gold);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, transform 0.1s;
+}
+
+button:hover:not(:disabled) {
+  color: var(--felt-dark);
+  background: var(--gold);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+button:focus-visible {
+  outline: 3px solid var(--cream);
+  outline-offset: 3px;
+}
+
+button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+#deal-button {
+  color: var(--felt-dark);
+  background: var(--gold);
+}
+
+@media (max-width: 540px) {
+  :root {
+    --card-width: 70px;
+  }
+
+  body {
+    padding: 10px;
+  }
+
+  .table {
+    padding: 24px 12px;
+    border-width: 8px;
+    border-radius: 36px;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  button {
+    padding: 0.7em 1.1em;
+    letter-spacing: 0.1em;
+  }
+}
