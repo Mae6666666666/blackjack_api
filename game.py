@@ -38,3 +38,26 @@ def total_calc(hand):
     if has_ace and total + 10 <= 21:
         total += 10
     return total
+
+
+# --- Checking hands ---------------------------------------------------------
+
+def is_bust(hand):
+    """True if the hand is over 21."""
+    return total_calc(hand) > 21
+
+
+def is_blackjack(hand):
+    """True if the hand is an ace and a ten-value card, and nothing else."""
+    return len(hand) == 2 and total_calc(hand) == 21
+
+
+def compare_hands(dealer_hand, player_hand):
+    """Which total is higher: "Dealer", "Player" or "Draw". Ignores busts."""
+    dealer_total = total_calc(dealer_hand)
+    player_total = total_calc(player_hand)
+    if dealer_total > player_total:
+        return "Dealer"
+    if dealer_total == player_total:
+        return "Draw"
+    return "Player"

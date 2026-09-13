@@ -74,3 +74,63 @@ def test_total_calc_suit_makes_no_difference():
 
 def test_total_calc_hand_with_no_ace_can_go_bust():
     assert game.total_calc(["d9", "h9", "s4"]) == 25
+
+
+# --- is_bust ----------------------------------------------------------------
+
+def test_is_bust_over_21_is_bust():
+    assert game.is_bust(["d9", "h9", "s4"]) is True  # 25
+
+
+def test_is_bust_20_is_not_bust():
+    assert game.is_bust(["d9", "h9"]) is False
+
+
+def test_is_bust_exactly_21_is_not_bust():
+    assert game.is_bust(["d9", "h9", "s0"]) is False  # ace counts as 1
+
+
+def test_is_bust_22_is_bust():
+    assert game.is_bust(["d9", "h9", "s1"]) is True
+
+
+def test_is_bust_small_hand_is_not_bust():
+    assert game.is_bust(["d2", "h1"]) is False  # 5
+
+
+# --- is_blackjack -----------------------------------------------------------
+
+def test_is_blackjack_ten_then_ace():
+    assert game.is_blackjack(["d9", "h0"]) is True
+
+
+def test_is_blackjack_ace_then_ten():
+    assert game.is_blackjack(["h0", "h9"]) is True
+
+
+def test_is_blackjack_ace_with_jack_queen_or_king():
+    assert game.is_blackjack(["h0", "c10"]) is True
+    assert game.is_blackjack(["h0", "s11"]) is True
+    assert game.is_blackjack(["h0", "s12"]) is True
+
+
+def test_is_blackjack_21_from_three_cards_is_not_blackjack():
+    assert game.is_blackjack(["h1", "s8", "s9"]) is False  # 2 + 9 + 10
+
+
+def test_is_blackjack_two_cards_under_21_is_not_blackjack():
+    assert game.is_blackjack(["h5", "s7"]) is False  # 14
+
+
+# --- compare_hands ----------------------------------------------------------
+
+def test_compare_hands_dealer_higher():
+    assert game.compare_hands(["h5", "s7"], ["h2", "d2"]) == "Dealer"
+
+
+def test_compare_hands_same_total_is_a_draw():
+    assert game.compare_hands(["h5", "s7"], ["c5", "d7"]) == "Draw"
+
+
+def test_compare_hands_player_higher():
+    assert game.compare_hands(["h5", "s7"], ["h0", "d9"]) == "Player"
