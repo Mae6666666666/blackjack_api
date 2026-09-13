@@ -14,6 +14,8 @@ static/deck/. The index runs 0-12, so it is one behind the card it stands for:
 An ace counts 11 whenever that keeps the hand at 21 or under, otherwise 1.
 """
 
+import random
+
 
 # --- Card values and totals -------------------------------------------------
 
@@ -61,3 +63,37 @@ def compare_hands(dealer_hand, player_hand):
     if dealer_total == player_total:
         return "Draw"
     return "Player"
+
+
+# --- The deck ---------------------------------------------------------------
+
+SUITS = ["h", "d", "s", "c"]
+
+
+def build_deck():
+    """A full 52-card deck, in order."""
+    deck = []
+    for index in range(13):
+        for suit in SUITS:
+            deck.append(suit + str(index))
+    return deck
+
+
+def deal_card(deck):
+    """Take the top card off the deck and return it. The deck gets shorter."""
+    return deck.pop(0)
+
+
+def deal_hand(deck, number):
+    """Deal `number` cards off the top of the deck."""
+    hand = []
+    for _ in range(number):
+        hand.append(deal_card(deck))
+    return hand
+
+
+def shuffle(deck):
+    """A shuffled copy of the deck. The original is left alone."""
+    shuffled = list(deck)
+    random.shuffle(shuffled)
+    return shuffled

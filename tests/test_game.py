@@ -134,3 +134,82 @@ def test_compare_hands_same_total_is_a_draw():
 
 def test_compare_hands_player_higher():
     assert game.compare_hands(["h5", "s7"], ["h0", "d9"]) == "Player"
+
+
+# --- build_deck -------------------------------------------------------------
+
+def test_build_deck_has_52_cards():
+    assert len(game.build_deck()) == 52
+
+
+def test_build_deck_contains_the_ace_of_diamonds():
+    assert "d0" in game.build_deck()
+
+
+def test_build_deck_has_13_of_each_suit():
+    deck = game.build_deck()
+    for suit in ["h", "d", "s", "c"]:
+        assert len([card for card in deck if card[0] == suit]) == 13
+
+
+def test_build_deck_has_no_repeated_cards():
+    deck = game.build_deck()
+    assert len(set(deck)) == 52
+
+
+# --- deal_card --------------------------------------------------------------
+
+def test_deal_card_takes_the_top_card():
+    assert game.deal_card(["h0", "h1", "h2"]) == "h0"
+
+
+def test_deal_card_takes_the_top_card_of_a_different_deck():
+    assert game.deal_card(["s5", "d2"]) == "s5"
+
+
+def test_deal_card_removes_the_card_from_the_deck():
+    deck = ["h0", "h1", "h2"]
+    game.deal_card(deck)
+    assert deck == ["h1", "h2"]
+
+
+# --- deal_hand --------------------------------------------------------------
+
+def test_deal_hand_deals_the_number_asked_for():
+    assert len(game.deal_hand(["h0", "h1", "h2", "h3"], 2)) == 2
+    assert len(game.deal_hand(["h0", "h1", "h2", "h3"], 3)) == 3
+
+
+def test_deal_hand_removes_the_dealt_cards_from_the_deck():
+    deck = ["h0", "h1", "h2", "h3"]
+    game.deal_hand(deck, 2)
+    assert deck == ["h2", "h3"]
+
+
+def test_deal_hand_deals_from_the_top():
+    assert game.deal_hand(["h0", "h1", "h2", "h3"], 2) == ["h0", "h1"]
+
+
+# --- shuffle ----------------------------------------------------------------
+
+def test_shuffle_keeps_52_cards():
+    assert len(game.shuffle(game.build_deck())) == 52
+
+
+def test_shuffle_changes_the_order():
+    # Could in theory come back in order -- about a 1 in 10^67 chance.
+    assert game.shuffle(game.build_deck()) != game.build_deck()
+
+
+def test_shuffle_keeps_exactly_the_same_cards():
+    assert sorted(game.shuffle(game.build_deck())) == sorted(game.build_deck())
+
+
+def test_shuffle_works_on_a_small_deck():
+    assert sorted(game.shuffle(["h0", "h1", "h2"])) == ["h0", "h1", "h2"]
+
+
+def test_shuffle_leaves_the_original_deck_alone():
+    deck = game.build_deck()
+    game.shuffle(deck)
+    assert deck == game.build_deck()
