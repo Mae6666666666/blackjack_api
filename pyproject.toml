@@ -9,6 +9,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "httpx2>=2.12.0",
     "pytest>=9.1.1",
 ]
 
@@ -19,3 +20,7 @@ package = false
 # Lets the tests do `from game import ...` without installing anything.
 pythonpath = ["."]
 testpaths = ["tests"]
+# A deprecation inside starlette's own test client -- not our code, so hide it.
+filterwarnings = [
+    "ignore:The anyio.abc.BlockingPortal alias is deprecated:DeprecationWarning",
+]
