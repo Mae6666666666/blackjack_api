@@ -1,0 +1,21 @@
+[project]
+name = "blackjack-api"
+version = "0.1.0"
+description = "Blackjack game logic in Python, served by a FastAPI API"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi[standard]>=0.141.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+# Lets the tests do `from game import ...` without installing anything.
+pythonpath = ["."]
+testpaths = ["tests"]
