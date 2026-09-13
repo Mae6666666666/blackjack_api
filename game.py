@@ -15,6 +15,7 @@ An ace counts 11 whenever that keeps the hand at 21 or under, otherwise 1.
 """
 
 import random
+from dataclasses import dataclass
 
 
 # --- Card values and totals -------------------------------------------------
@@ -131,3 +132,63 @@ def who_wins(dealer_hand, player_hand):
         return "Dealer"
 
     return compare_hands(dealer_hand, player_hand)
+
+
+# --- Playing a round --------------------------------------------------------
+
+PLAYER_TURN = "player_turn"
+FINISHED = "finished"
+
+
+class GameOverError(Exception):
+    """Raised when someone tries to hit or stand after the round is over."""
+
+
+@dataclass
+class Game:
+    """Everything about one round of blackjack."""
+    deck: list
+    player_hand: list
+    dealer_hand: list
+    status: str = PLAYER_TURN
+    result: str | None = None
+
+
+def start_game(deck):
+    """Deal two cards to the player, then two to the dealer.
+
+    If either of them has blackjack the round is over straight away.
+    """
+    player_hand = deal_hand(deck, 2)
+    dealer_hand = deal_hand(deck, 2)
+    game = Game(deck=deck, player_hand=player_hand, dealer_hand=dealer_hand)
+
+    if is_blackjack(player_hand) or is_blackjack(dealer_hand):
+        _finish(game)
+    return game
+
+
+def player_hit(game):
+    """Give the player one more card. Going bust ends the round."""
+    if game.status == FINISHED:
+        raise GameOverError("The round is already over")
+
+    game.player_hand.append(deal_card(game.deck))
+    if is_bust(game.player_hand):
+        _finish(game)
+    return game
+
+
+def player_stand(game):
+    """The player is done: the dealer plays out their hand and the round ends."""
+    if game.status == FINISHED:
+        raise GameOverError("The round is already over")
+
+    play_dealer_turn(game.deck, game.dealer_hand)
+    _finish(game)
+    return game
+
+
+def _finish(game):
+    game.status = FINISHED
+    game.result = who_wins(game.dealer_hand, game.player_hand)

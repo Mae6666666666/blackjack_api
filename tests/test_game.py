@@ -1,3 +1,5 @@
+import pytest
+
 import game
 
 
@@ -298,3 +300,101 @@ def test_who_wins_dealer_blackjack_beats_a_player_21():
 
 def test_who_wins_two_blackjacks_draw():
     assert game.who_wins(["d0", "d12"], ["h0", "h9"]) == "Draw"
+
+
+# --- start_game -------------------------------------------------------------
+
+def test_start_game_player_gets_the_top_two_cards():
+    g = game.start_game(["h9", "h5", "d9", "d6", "c2"])
+    assert g.player_hand == ["h9", "h5"]
+
+
+def test_start_game_dealer_gets_the_next_two_cards():
+    g = game.start_game(["h9", "h5", "d9", "d6", "c2"])
+    assert g.dealer_hand == ["d9", "d6"]
+
+
+def test_start_game_the_rest_of_the_deck_is_kept():
+    g = game.start_game(["h9", "h5", "d9", "d6", "c2"])
+    assert g.deck == ["c2"]
+
+
+def test_start_game_it_is_the_players_turn():
+    g = game.start_game(["h9", "h5", "d9", "d6", "c2"])
+    assert g.status == game.PLAYER_TURN
+    assert g.result is None
+
+
+def test_start_game_player_blackjack_ends_the_round():
+    g = game.start_game(["h0", "h12", "d9", "d6", "c2"])
+    assert g.status == game.FINISHED
+    assert g.result == "Player"
+
+
+def test_start_game_dealer_blackjack_ends_the_round():
+    g = game.start_game(["h9", "h5", "d0", "d12", "c2"])
+    assert g.status == game.FINISHED
+    assert g.result == "Dealer"
+
+
+# --- player_hit -------------------------------------------------------------
+
+def test_player_hit_gives_the_player_the_next_card():
+    g = game.start_game(["h9", "h5", "d9", "d6", "c2"])
+    game.player_hit(g)
+    assert g.player_hand == ["h9", "h5", "c2"]
+
+
+def test_player_hit_under_21_is_still_the_players_turn():
+    g = game.start_game(["h9", "h5", "d9", "d6", "c2"])  # 16, then a 3
+    game.player_hit(g)
+    assert g.status == game.PLAYER_TURN
+
+
+def test_player_hit_bust_ends_the_round_and_the_dealer_wins():
+    g = game.start_game(["h9", "h5", "d9", "d6", "s9"])  # 16, then a 10
+    game.player_hit(g)
+    assert g.status == game.FINISHED
+    assert g.result == "Dealer"
+
+
+def test_player_hit_bust_means_the_dealer_takes_no_cards():
+    g = game.start_game(["h9", "h5", "d9", "d2", "s9", "c2"])  # dealer on 13
+    game.player_hit(g)
+    assert g.dealer_hand == ["d9", "d2"]
+
+
+def test_player_hit_after_the_round_is_over_is_an_error():
+    g = game.start_game(["h9", "h5", "d9", "d6", "s9", "c2"])
+    game.player_hit(g)  # bust
+    with pytest.raises(game.GameOverError):
+        game.player_hit(g)
+
+
+# --- player_stand -----------------------------------------------------------
+
+def test_player_stand_ends_the_round():
+    g = game.start_game(["h9", "h8", "d9", "d6", "c2"])
+    game.player_stand(g)
+    assert g.status == game.FINISHED
+
+
+def test_player_stand_dealer_plays_out_their_hand():
+    # Dealer on 15 takes c3 (a 4) and stands on 19.
+    g = game.start_game(["h9", "h8", "d9", "d4", "c3", "c9"])
+    game.player_stand(g)
+    assert g.dealer_hand == ["d9", "d4", "c3"]
+
+
+def test_player_stand_sets_the_result():
+    # Player 18, dealer 17 stands.
+    g = game.start_game(["h9", "h7", "d9", "d6", "c2"])
+    game.player_stand(g)
+    assert g.result == "Player"
+
+
+def test_player_stand_after_the_round_is_over_is_an_error():
+    g = game.start_game(["h9", "h7", "d9", "d6", "c2"])
+    game.player_stand(g)
+    with pytest.raises(game.GameOverError):
+        game.player_stand(g)
